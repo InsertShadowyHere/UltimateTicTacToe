@@ -1,5 +1,3 @@
-import sys
-import random
 import pygame
 
 pygame.init()
@@ -30,14 +28,12 @@ pygame.display.set_caption("Ultimate Tic-Tac-Toe")
 
 class Board:
     def __init__(self, pos):
-        self.grid = []
+        self.grid = [None] * 9
         self.pos = pos
 
         self.scored = None
 
         self.rect = pygame.rect.Rect(pos[0], pos[1], BOARD_SIZE, BOARD_SIZE)
-        for _ in range(9):
-            self.grid.append(random.choice([None]))
 
         self.click_rects = []
         for n in range(9):
@@ -227,4 +223,3 @@ while running:
     render()
     pygame.display.flip()
 pygame.quit()
-sys.exit()
