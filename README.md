@@ -1,4 +1,4 @@
-Fully functional Ultimate Tic-Tac-Toe! Just boot up Python and run the main.py file in the venv, or run pip install pygame, and run it from your system.
+Fully functional Ultimate Tic-Tac-Toe! Just boot up Python, run pip install pygame, and then run game.py.
 
 Rules:
 Each smaller board functions as an individual tic-tac-toe board, but there's a twist.
