@@ -1,4 +1,5 @@
-Fully functional Ultimate Tic-Tac-Toe! Just boot up Python, run pip install pygame, and then run game.py.
+Fully functional Ultimate Tic-Tac-Toe! To try it out, either visit [the website](https://InsertShadowyHere.github.io/UltimateTicTacToe) or boot up Python, install pygame, and run game.py.
+It's worth noting that the python version is not resizable, and is stuck in 940x940, but that's OK, because I said it is
 
 Rules:
 Each smaller board functions as an individual tic-tac-toe board, but there's a twist.
