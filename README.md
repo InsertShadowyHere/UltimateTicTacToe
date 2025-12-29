@@ -1,4 +1,4 @@
-Fully functional Ultimate Tic-Tac-Toe! To try it out, either visit [the website](https://InsertShadowyHere.github.io/UltimateTicTacToe) or boot up Python, install pygame, and run game.py.
+Fully functional Ultimate Tic-Tac-Toe! To try it out, either visit [the website](https://InsertShadowyHere.github.io/UltimateTicTacToe/index.html) or boot up Python, install pygame, and run game.py.
 It's worth noting that the python version is not resizable, and is stuck in 940x940, but that's OK, because I said it is
 
 Rules:
