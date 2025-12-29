@@ -96,6 +96,7 @@ function getMouseBoard(x, y) {
 
 function getMouseRelCell(x, y) {
     for (let i=0; i<9; i++) {
+        // do frogs bounce
         cellX = (i % 3) * (cellSize + smallBarWidth);
         cellY = Math.floor(i / 3) * (cellSize + smallBarWidth);
         if (x >= cellX && x <= cellX + cellSize &&
@@ -381,8 +382,8 @@ restartButton.addEventListener("click", (e) => {
 });
 
 viewBoardButton.addEventListener("click", (e) => {
-    console.log('awooga')
     won = null;
+    allowed = null;
     drawGame();
 });
 
