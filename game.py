@@ -11,10 +11,10 @@ RED = (200, 0, 0)
 DARK_RED = (50, 0, 0)
 DARK_BLUE = (0, 0, 50)
 
-img_X = pygame.image.load("x.png")
+img_X = pygame.image.load("assets/x.png")
 img_X = pygame.transform.scale_by(img_X, 4)
 big_img_X = pygame.transform.scale_by(img_X, 5)
-img_O = pygame.image.load("o.png")
+img_O = pygame.image.load("assets/o.png")
 img_O = pygame.transform.scale_by(img_O, 4)
 big_img_O = pygame.transform.scale_by(img_O, 5)
 imgs = {1: img_X, 0: img_O}

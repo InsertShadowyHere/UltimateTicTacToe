@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="test.css">
+</head>
+<body>
+<div class='container'>
+  <div class='sidebar'>
+
+    <h1 class="title">Ultimate Tic-Tac-Toe</h1>
+    <h2 class="subtitle">by InsertShadowyHere</h2>
+    <main class='description'>
+      <p>
+        Hi! Welcome to Ultimate Tic-Tac-Toe. This is the first website I've ever made, so hopefully
+        it's only up from here. Enjoy the game, and feel free to check out some of my other stuff.
+        :)
+      </p>
+      <br>
+      <p>
+        <strong>How To Play</strong><br>
+        The objective of the game is to score three small boards in a row (so, like a normal game of Tic-Tac-Toe).
+        Each of those small boards must be won themselves.<br>
+        The trick comes down to placement. You can only place an X or O in the 
+        board that corresponds to your opponent's last square.<br>
+        For example, if I played in the top right square of my board,
+        you'd only be able to play in the top right board.<br>
+        If you're forced into a board that's already been won, or one that's full,
+        you can play wherever you want.
+      </p>
+      <br> <br> <br>
+      <button id="restart">Restart</button>
+  </div>
+  <div class='main'>
+    <canvas id="gameCanvas"></canvas>
+    <script src="game.js"></script>
+  </div>
+</div>
+</body>
+</html>
+
