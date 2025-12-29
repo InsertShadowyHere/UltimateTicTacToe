@@ -2,9 +2,11 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const statusDisplay = document.getElementById('status');
 const restartButton = document.getElementById('restart');
-
+const viewBoardButton = document.getElementById('viewBoard');
+// TODO - add undo button, maybe fix spacing if i care enough
 canvas.height = window.innerHeight - 10;
 canvas.width = canvas.height;
+viewBoardButton.hidden = true;
 
 // COLORS
 const WHITE = '#FFFFFF';
@@ -18,26 +20,32 @@ const DARK_BLUE = '#000032';
 const GRAY = '#888888';
 
 // RESIZING STUFF
-let outerMargin;
-let innerMargin;
-let bigBarWidth;
-let smallBarWidth;
+let outerMargin, innerMargin;
+let bigBarWidth, smallBarWidth;
 let pos;
 let availSpace = canvas.width - outerMargin*2;
-let boardSize;
-let boardReal;
-let cellSize;
+let boardSize, boardReal, cellSize;
+let imgMargin, imgSize;
+let bigFont, lilFont;
 
 // TEMPs
 let relX;
 let relY;
+let notFull = 0;
 
 // GAME VARS
 let turn = 1;
 let allowed = null;
 let boards = [];
 let won = null;
-let debug_mode = true;
+let gameOver = null;
+let debug_mode = false; // developer only so no touchies pls - it lets you play anywhere
+
+// DRAWING
+imgO = new Image()
+imgO.src = "assets/o.png"
+imgX = new Image()
+imgX.src = "assets/x.png"
 
 // GRAPHICAL FUNCTIONS
 function handleResize () {
@@ -55,6 +63,12 @@ function handleResize () {
     boardReal = boardSize - innerMargin * 2
 
     cellSize = Math.floor((boardReal - smallBarWidth * 2) / 3);
+
+    imgMargin = Math.floor(cellSize/10);
+    imgSize = cellSize - 2*imgMargin;
+
+    bigFont = Math.floor(canvas.width / 30)
+    lilFont = Math.floor(canvas.width / 45)
 
     setBoardsPos();
     drawGame();
@@ -98,27 +112,33 @@ class Board {
         this.scored = null;
         this.tl = pos;
         this.br = [pos[0] + boardReal, pos[1] + boardReal];
-        this.check();
-        console.log(this.scored)
         
     }
 
     check() {
-        // check horizontal scores
+        notFull = 0;
+        // check to see if grid is filled
+        for (let i=0; i<9; i++) {
+            if (this.grid[i] !== null)
+                notFull += 1;
+        }
+        if (notFull === 9){
+            this.scored = 2;
+            return
+        }
+
         for (let i=0; i<3; i++) {
+            // check horizontal
             if (this.grid[i*3] === this.grid[i*3 + 1] 
                 && this.grid[i*3] === this.grid[i*3 + 2] 
                 && this.grid[i*3] !== null)
                 this.scored = this.grid[i*3];
-
-        }
-        // vertical
-        for (let i=0; i<3; i++) {
+            // vertical
             if (this.grid[i] === this.grid[i+3]
                 && this.grid[i] === this.grid[i+6] 
                 && this.grid[i] !== null) {this.scored = this.grid[i];}
-                
         }
+        
         // diagonal tl-br
         if (this.grid[0] === this.grid[4] 
             && this.grid[0] === this.grid[8] 
@@ -129,8 +149,9 @@ class Board {
             && this.grid[2] === this.grid[6] 
             && this.grid[2] !== null)
             this.scored = this.grid[2];
-
-        if (this.scored)
+        
+        
+        if (this.scored !== null)
             bigCheck();
     }
 
@@ -139,6 +160,12 @@ class Board {
     }
 
     draw(dulled) {
+        ctx.imageSmoothingEnabled = false;
+        if (this.scored === 1 || this.scored === 0) {
+            
+            ctx.drawImage(this.scored === 1 ? imgX : imgO, this.tl[0]+imgMargin, this.tl[1]+imgMargin, boardReal-2*imgMargin, boardReal-2*imgMargin)
+            return
+        }
         ctx.fillStyle = dulled === false ? WHITE : GRAY;
 
         // vertical
@@ -156,15 +183,11 @@ class Board {
             ctx.fillStyle = this.grid[i] === 1 ? RED : BLUE
             relX = this.tl[0] + (cellSize+smallBarWidth)*(i % 3)
             relY = this.tl[1] + (cellSize+smallBarWidth)*Math.floor(i/3)
-            let tmpX = this.tl[0] + cellSize+smallBarWidth
-            ctx.fillRect(relX, relY, cellSize, cellSize)
+            
+            ctx.drawImage(this.grid[i] === 1 ? imgX : imgO, relX+imgMargin, relY+imgMargin, imgSize, imgSize)
+            //ctx.fillRect(relX, relY, cellSize, cellSize)
 
             // TODO - add image loading -------------------------
-        }
-
-        if (this.scored !== null) {
-            ctx.fillStyle = this.scored === 1 ? RED : BLUE
-            ctx.fillRect(this.tl[0], this.tl[1], boardReal, boardReal)
         }
     }
 };
@@ -179,34 +202,52 @@ function initBoards() {
 }
 
 initBoards();
+// ok lets be real whos reading the code for my crappy web game???
+// i appreciate you whoever you are
+// youre awesome
 
 function bigCheck() {
+    notFull = 0;
+    // check to see if grid is filled
+    for (let i=0; i<9; i++) {
+        if (boards[i].scored !== null)
+            notFull += 1;
+    }
+    if (notFull === 9){
+        won = 2;
+        return
+    }
     // check horizontal scores
     for (let i=0; i<3; i++) {
         if (boards[i*3].scored === boards[i*3 + 1].scored 
             && boards[i*3].scored === boards[i*3 + 2].scored 
-            && boards[i*3].scored !== null)
+            && (0 === boards[i*3].scored
+            || 1 === boards[i*3].scored))
             won = boards[i*3].scored;
-
-    }
-    // vertical
-    for (let i=0; i<3; i++) {
         if (boards[i].scored === boards[i+3].scored 
             && boards[i].scored === boards[i+6].scored 
-            && boards[i].scored !== null)
+            && (0 === boards[i].scored
+            || 1 === boards[i].scored))
             won = boards[i].scored;
-            
+
     }
     // diagonal tl-br
     if (boards[0].scored === boards[4].scored
         && boards[0].scored === boards[8].scored 
-        && boards[0].scored !== null)
+        && (0 === boards[0].scored
+        || 1 === boards[0].scored))
         won = boards[0].scored;
     // diagonal tr-bl
     if (boards[2].scored === boards[4].scored
         && boards[2].scored === boards[6].scored 
-        && boards[2].scored !== null)
+        && (0 === boards[2].scored
+        || 1 === boards[2].scored))
         won = boards[2].scored;
+    
+    if (won !== null) {
+        gameOver = 1;
+        viewBoardButton.hidden = false;
+    }
 }
 
 handleResize();
@@ -216,8 +257,8 @@ function handleClick(e) {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     // on click, we should:
-    // check that the game isn't won already
-    if (won !== null)
+    // check that the game isn't over already
+    if (gameOver !== null)
         return
     // get board that's being clicked on
     boardNum = getMouseBoard(x, y);
@@ -258,45 +299,50 @@ function handleClick(e) {
 }
 
 
-/*
-ctx.strokeStyle
-ctx.beginPath
-ctx.beginPath();
-ctx.moveTo(pos.x + 178, pos.y + 20);
-ctx.lineTo(pos.x + 178, pos.y + 260);
-ctx.stroke();
-ctx.fillStyle = boardWinner === 1 ? 'rgba(200, 200, 200, 0.5)' : 'rgba(200, 200, 200, 0.5)';
-ctx.fillRect(pos.x, pos.y, BOARD_SIZE, BOARD_SIZE);
-
-ctx.fillStyle = WHITE;
-ctx.font = 'bold 60px Arial';
-ctx.textAlign = 'center';
-ctx.textBaseline = 'middle';
-
-ctx.font = 'bold 60px Arial';
-ctx.textAlign = 'center';
-ctx.textBaseline = 'middle';
-ctx.fillText('X', pos.x + BOARD_SIZE / 2, pos.y + BOARD_SIZE / 2);
-ctx.fillText('O', pos.x + BOARD_SIZE / 2, pos.y + BOARD_SIZE / 2);
-ctx.fillText('D', pos.x + BOARD_SIZE / 2, pos.y + BOARD_SIZE / 2);
-ctx.fillStyle = WHITE;
-ctx.font = '50px Arial';
-ctx.textAlign = 'center';
-ctx.textBaseline = 'middle';
-
-
-*/
 function drawGame() {
+    
     ctx.fillStyle = turn === 1 ? DARK_RED : DARK_BLUE;
+    if (gameOver)
+        ctx.fillStyle = "rgb(60, 60, 60)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 0: if game is won, show win overlay and return
     if (won !== null) {
-        if (won == 2) 
+        let userText;
+        if (won == 2) {
             ctx.fillStyle = BLACK;
-        else
+            userText = "Nobody"; 
+        }
+        else {
             ctx.fillStyle = won === 1 ? DARK_RED : DARK_BLUE;
+            userText = won === 1 ? "X" : "O"
+        }
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = WHITE;
+        ctx.font = String(bigFont) + "pt Helvetica"
+        let mst = ctx.measureText(userText + " won the game! Well done.")
+        ctx.fillText(userText + " won the game! Well done.", canvas.width/2 - mst.width/2, canvas.height/2)
+        // no way ur still reading my code!!
+        // awesomeeeeeee
+        // i think im in love
+        // (with you)
+        // 
+        // ...
+        //
+        // ...
+        //
+        // see that's funny because i dont know who you are and so im confessing my love to a complete stranger
+        // 
+        // but thats the trick - maybe i DO love you and i just dont know that ur reading my code
+        // or maybe i think youre a really awful person and this is extra weird
+        // i doubt the latter cus there aren't many people i think that about
+        // either way ur probbaly cool so yea
+        // thanks
+        // for being cool
+        // i guess
+        ctx.font = String(lilFont) + "pt Helvetica"
+        let mst2 = ctx.measureText("Use the sidebar buttons to continue.")
+        ctx.fillText("Use the sidebar buttons to continue.", canvas.width/2 - mst2.width/2, canvas.height/2+(bigFont+lilFont)*0.8)
         return
     }
 
@@ -327,6 +373,15 @@ restartButton.addEventListener("click", (e) => {
     allowed = null;
     boards = [];
     initBoards();
+    won = null;
+    gameOver = null;
+    viewBoardButton.hidden = true;
+    // the potatos are taking over my miiiiiiiiiind
+    drawGame();
+});
+
+viewBoardButton.addEventListener("click", (e) => {
+    console.log('awooga')
     won = null;
     drawGame();
 });
